@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import './App.css'
 
-function DenominationCard({ label, testId, count}) {
+function DenominationCard({ label, testId, count }) {
   return (
     <div className="col-xs-6 col-sm-3">
       <div className="well text-center">
@@ -12,7 +13,60 @@ function DenominationCard({ label, testId, count}) {
 }
 
 function App() {
-  // Add you
+  const [amountDue, setAmountDue] = useState(' ');
+  const [amountReceived, setAmountReceived] = useState(' ');
+  const [changeDue, setChangeDue] = useState(0);
+
+  const [twenties, setTwenties] = useState(0);
+  const [tens, setTens] = useState(0);
+  const [fives, setFives] = useState(0);
+  const [ones, setOnes] = useState(0);
+  const [quarters, setQuarters] = useState(0);
+  const [dimes, setDimes] = useState(0);
+  const [nickels, setNickels] = useState(0);
+  const [pennies, setPennies] = useState(0);
+
+  function calculate() {
+    const dueCents = Math.round(Number(amountDue) * 100)
+    const receivedCents = Math.round(Number(amountReceived) * 100)
+    const changeCents = receivedCents - dueCents
+
+    setChangeDue(changeCents / 100)
+
+    let remaining = Math.max(changeCents, 0)
+
+    const twentiesCount = Math.floor(remaining / 2000)
+    remaining = remaining % 2000
+
+    const tensCount = Math.floor(remaining / 1000)
+    remaining = remaining % 1000
+
+    const fivesCount = Math.floor(remaining / 500)
+    remaining = remaining % 500
+
+    const onesCount = Math.floor(remaining / 100)
+    remaining = remaining % 100
+
+    const quartersCount = Math.floor(remaining / 25)
+    remaining = remaining % 25
+
+    const dimesCount = Math.floor(remaining / 10)
+    remaining = remaining % 10
+
+    const nickelsCount = Math.floor(remaining / 5)
+    remaining = remaining % 5
+
+    const penniesCount = remaining
+
+    setTwenties(twentiesCount)
+    setTens(tensCount)
+    setFives(fivesCount)
+    setOnes(onesCount)
+    setQuarters(quartersCount)
+    setDimes(dimesCount)
+    setNickels(nickelsCount)
+    setPennies(penniesCount)
+  }
 
   return (
     <>
@@ -28,15 +82,17 @@ function App() {
               <div className="panel-body">
                 <div className="form-group">
                   <label htmlFor="amountDue">How much is due?</label>
-                  <input id="amountDue" data-testid="amountDue" type="number" step="0.01" className="form-control" />
+                  <input id="amountDue" data-testid="amountDue" type="number" step="0.01" className="form-control"
+                    value={amountDue} onChange={(e) => setAmountDue(e.target.value)} />
                 </div>
                 <div className="form-group">
                   <label htmlFor="amountReceived">How much was received?</label>
-                  <input id="amountReceived" data-testid="amountReceived" type="number" step="0.01" className="form-control" />
+                  <input id="amountReceived" data-testid="amountReceived" type="number" step="0.01" className="form-control"
+                    value={amountReceived} onChange={(e) => setAmountReceived(e.target.value)} />
                 </div>
               </div>
               <div className="panel-footer">
-                <button data-testid="calculate" className="btn btn-primary btn-block">Calculate</button>
+                <button data-testid="calculate" className="btn btn-primary btn-block" onClick={calculate}>Calculate</button>
               </div>
             </div>
           </div>
@@ -44,23 +100,31 @@ function App() {
           <div className="col-md-8">
             <div className="panel panel-default">
               <div className="panel-body">
-                <div className="alert alert-sucess text-center">The total change due is $0.00</div>
+                {changeDue >= 0 ? (
+                  <div className="alert alert-success text-center">
+                    The total change due is ${changeDue.toFixed(2)}
+                  </div>
+                ) : (
+                  <div className="alert alert-danger text-center">
+                    Additional money owed is ${Math.abs(changeDue).toFixed(2)}
+                  </div>
+                )}
                 <div className="row">
-                  <DenominationCard label="Twenties" testId="twenties" count={0} />
-                  <DenominationCard label="Tens" testId="tens" count={0} />
-                  <DenominationCard label="Fives" testId="fives" count={0} />
-                  <DenominationCard label="Ones" testId="ones" count={0} />
-                  <DenominationCard label="Quarters" testId="quarters" count={0} />
-                  <DenominationCard label="Dimes" testId="dimes" count={0} />
-                  <DenominationCard label="Nickels" testId="nickels" count={0} />
-                  <DenominationCard label="Pennies" testId="pennies" count={0} />
+                  <DenominationCard label="Twenties" testId="twenties" count={twenties} />
+                  <DenominationCard label="Tens" testId="tens" count={tens} />
+                  <DenominationCard label="Fives" testId="fives" count={fives} />
+                  <DenominationCard label="Ones" testId="ones" count={ones} />
+                  <DenominationCard label="Quarters" testId="quarters" count={quarters} />
+                  <DenominationCard label="Dimes" testId="dimes" count={dimes} />
+                  <DenominationCard label="Nickels" testId="nickels" count={nickels} />
+                  <DenominationCard label="Pennies" testId="pennies" count={pennies} />
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+
     </>
   )
 }
